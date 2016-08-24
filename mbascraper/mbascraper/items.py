@@ -14,4 +14,6 @@ class MbascraperItem(scrapy.Item):
     link = scrapy.Field()
     gridref = scrapy.Field()
     location = scrapy.Field()
+    description = scrapy.Field()
+    images = scrapy.Field()
     pass

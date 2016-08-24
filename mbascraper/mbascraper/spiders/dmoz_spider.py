@@ -3,10 +3,20 @@ import scrapy
 
 from mbascraper.items import MbascraperItem
 
+def first_or_null(list):
+    try:
+        return list[0]
+    except IndexError:
+        return None
 
 class DmozSpider(scrapy.Spider):
     name = "mba"
     allowed_domains = ["www.mountainbothies.org.uk"]
+    '''
+    start_urls = [
+        "http://www.mountainbothies.org.uk/region.asp?region_id=1"
+    ]
+    '''
     start_urls = [
         "http://www.mountainbothies.org.uk/region.asp?region_id=1",
         "http://www.mountainbothies.org.uk/region.asp?region_id=2",
@@ -18,16 +28,18 @@ class DmozSpider(scrapy.Spider):
         "http://www.mountainbothies.org.uk/region.asp?region_id=8",
         "http://www.mountainbothies.org.uk/region.asp?region_id=9"
     ]
+    
+
 
     def parse(self, response):
         for sel in response.xpath('//div[@id="content-left"]/ul/li'):
             
             item = MbascraperItem()
             
-            item['link'] = sel.xpath('a/@href').extract()
+            item['link'] = first_or_null(sel.xpath('a/@href').extract())
             
             url = sel.xpath('a/@href').extract() 
-            url = response.urljoin(url[0])
+            url = response.urljoin(first_or_null(url))
 
             yield scrapy.Request(url, meta = {'item': item}, callback=self.parse_bothy_page)
 
@@ -44,12 +56,36 @@ class DmozSpider(scrapy.Spider):
         #print item['name'], item['link']
         #print response.Request.url
 
-        item['name'] = response.xpath('//div[@id="content-left"]/h1/text()').extract()
+        item['name'] = first_or_null(response.xpath('//div[@id="content-left"]/h1/text()').extract())
 
-        item['gridref'] = response.xpath('//div[@id="content-left"]/p/strong[1]/text()').extract()
-        item['location'] = response.xpath('//div[@id="content-left"]/p/strong[2]/text()').extract()
+        
 
+        s_gridref = first_or_null(response.xpath('//div[@id="content-left"]/p/strong[1]/text()').extract())
+        if s_gridref is not None:
+            # parse out what we want
+            i_pos = s_gridref.find(":")
+            i_start = i_pos + 1
+            i_end = i_start + 10
+            s_gridref = s_gridref[i_start:i_end].replace(" ", "")
+
+        item['gridref'] = s_gridref
+
+        item['location'] = first_or_null(response.xpath('//div[@id="content-left"]/p/strong[2]/text()').extract())
+
+        item['description'] = first_or_null(response.xpath('//div[@id="content-left"]/p[2]/text()').extract())
+
+
+        a_images = []
+
+        for image in response.xpath('//div[@id="bothy-gallery"]/a'):
+
+            img = first_or_null(image.xpath('img/@src').extract())
+
+            if img is not None:
+                a_images.append(img)
+
+        item['images'] = a_images
 
         yield item
-        #print item
-        #print response.request.url
+
+

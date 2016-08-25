@@ -10,10 +10,11 @@ import scrapy
 
 class MbascraperItem(scrapy.Item):
     # define the fields for your item here like:
+    bothy_id = scrapy.Field()
     name = scrapy.Field()
     link = scrapy.Field()
     gridref = scrapy.Field()
-    location = scrapy.Field()
+    region = scrapy.Field()
     description = scrapy.Field()
     images = scrapy.Field()
     pass

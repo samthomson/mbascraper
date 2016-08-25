@@ -9,9 +9,13 @@ def first_or_null(list):
     except IndexError:
         return None
 
+def substring_after(s, delim):
+    return s.partition(delim)[2]
+
 class DmozSpider(scrapy.Spider):
     name = "mba"
     allowed_domains = ["www.mountainbothies.org.uk"]
+    
     '''
     start_urls = [
         "http://www.mountainbothies.org.uk/region.asp?region_id=1"
@@ -27,8 +31,7 @@ class DmozSpider(scrapy.Spider):
         "http://www.mountainbothies.org.uk/region.asp?region_id=7",
         "http://www.mountainbothies.org.uk/region.asp?region_id=8",
         "http://www.mountainbothies.org.uk/region.asp?region_id=9"
-    ]
-    
+    ]   
 
 
     def parse(self, response):
@@ -37,6 +40,8 @@ class DmozSpider(scrapy.Spider):
             item = MbascraperItem()
             
             item['link'] = first_or_null(sel.xpath('a/@href').extract())
+
+            item['bothy_id'] = substring_after(item['link'], '=')
             
             url = sel.xpath('a/@href').extract() 
             url = response.urljoin(first_or_null(url))
@@ -70,7 +75,7 @@ class DmozSpider(scrapy.Spider):
 
         item['gridref'] = s_gridref
 
-        item['location'] = first_or_null(response.xpath('//div[@id="content-left"]/p/strong[2]/text()').extract())
+        item['region'] = first_or_null(response.xpath('//div[@id="content-left"]/p/strong[2]/text()').extract())
 
         item['description'] = first_or_null(response.xpath('//div[@id="content-left"]/p[2]/text()').extract())
 
@@ -85,6 +90,7 @@ class DmozSpider(scrapy.Spider):
                 a_images.append(img)
 
         item['images'] = a_images
+        #item['images'] = 'images'#a_images
 
         yield item
 

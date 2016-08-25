@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<convert xmlns="http://www.nearby.org.uk"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://www.nearby.org.uk/api/convert.xsd">
+	<info href="http://www.nearby.org.uk/api/convert-help.php"/>
+	<input>
+		<gr datum="osgb36" gr="NN375481"/>
+	</input>
+	<output>
+		<gaz country="United Kingdom"/>
+		<en datum="osgb36" e="237500" n="748100"/>
+		<gr10 datum="osgb36" gr10="NN 37500 48100"/>
+		<ll datum="wgs84" lat="56.596556849712" long="-4.6483202028446"/>
+	</output>
+</convert>
